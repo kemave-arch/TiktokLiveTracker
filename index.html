@@ -428,6 +428,28 @@
 
     .camera-btn-group { display: flex; gap: 0.4rem; justify-content: center; margin-top: 0.4rem; flex-wrap: wrap; }
 
+    /* Cross-platform safe hidden-input pattern.
+       IMPORTANT: do NOT use display:none for file inputs that are triggered
+       programmatically via .click() -- some iOS WebKit-based browsers
+       (incl. Chrome for iOS, which runs on WKWebView) will silently refuse
+       to open the native picker for an input that has no layout box.
+       Keeping the input in the render tree (off-screen, zero-size,
+       opacity 0) instead of display:none fixes this while remaining
+       fully invisible and non-interactive to the user. */
+    .hidden-file-input {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
     @media screen {
       body { padding-bottom: calc(4.2rem + env(safe-area-inset-bottom, 0px)); }
     }
@@ -665,8 +687,8 @@
             <button type="button" class="btn" style="margin:0; padding:0.35rem 0.7rem;" onclick="triggerFileInput('input-before-cam')" data-i18n="takePhoto">📸 ถ่ายรูป</button>
           </div>
 
-          <input type="file" id="input-before-file" accept="image/*" style="position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; z-index:-1;">
-          <input type="file" id="input-before-cam" accept="image/*" capture="environment" style="position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; z-index:-1;">
+          <input type="file" id="input-before-file" accept="image/*" class="hidden-file-input">
+          <input type="file" id="input-before-cam" accept="image/*" capture="environment" class="hidden-file-input">
 
           <div>
             <span class="status-badge" id="status-before" data-i18n="noPhoto">ยังไม่ได้แนบรูป</span>
@@ -686,8 +708,8 @@
             <button type="button" class="btn" style="margin:0; padding:0.35rem 0.7rem;" onclick="triggerFileInput('input-after-cam')" data-i18n="takePhoto">📸 ถ่ายรูป</button>
           </div>
 
-          <input type="file" id="input-after-file" accept="image/*" style="position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; z-index:-1;">
-          <input type="file" id="input-after-cam" accept="image/*" capture="environment" style="position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; z-index:-1;">
+          <input type="file" id="input-after-file" accept="image/*" class="hidden-file-input">
+          <input type="file" id="input-after-cam" accept="image/*" capture="environment" class="hidden-file-input">
 
           <div>
             <span class="status-badge" id="status-after" data-i18n="noPhoto">ยังไม่ได้แนบรูป</span>
@@ -833,7 +855,7 @@
         
         <label class="btn btn-secondary" style="margin:0; cursor:pointer;">
           📥 <span data-i18n="importBackupBtn">กู้คืนข้อมูล (Restore Backup)</span>
-          <input type="file" id="input-import-backup" accept=".json" style="display:none;" onchange="importBackupData(event)">
+          <input type="file" id="input-import-backup" accept=".json" class="hidden-file-input" onchange="importBackupData(event)">
         </label>
 
         <button type="button" class="btn btn-danger" onclick="clearAllData()">
